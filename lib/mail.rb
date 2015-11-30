@@ -6,7 +6,13 @@ module Mail # :doc:
 
   require 'uri'
   require 'net/smtp'
-  require 'mime/types'
+
+  begin
+    # Use mime/types/columnar if available, for reduced memory usage
+    require 'mime/types/columnar'
+  rescue LoadError
+    require 'mime/types'
+  end
 
   if RUBY_VERSION <= '1.8.6'
     begin
@@ -41,7 +47,7 @@ module Mail # :doc:
     require 'mail/multibyte'
   end
 
-  require 'mail/patterns'
+  require 'mail/constants'
   require 'mail/utilities'
   require 'mail/configuration'
 
@@ -76,15 +82,17 @@ module Mail # :doc:
 
   require 'mail/envelope'
 
-  require 'load_parsers'
+  register_autoload :Parsers, "mail/parsers"
 
   # Autoload header field elements and transfer encodings.
   require 'mail/elements'
   require 'mail/encodings'
   require 'mail/encodings/base64'
   require 'mail/encodings/quoted_printable'
+  require 'mail/encodings/unix_to_unix'
 
   require 'mail/matchers/has_sent_mail'
+  require 'mail/matchers/attachment_matchers.rb'
 
   # Finally... require all the Mail.methods
   require 'mail/mail'
